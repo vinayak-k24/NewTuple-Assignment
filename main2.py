@@ -81,52 +81,37 @@ def extract_financials(text):
 
     return financials
 
-# Step 5: Extract year from text
-def extract_year(text):
-    first_sentence = process_text(text)[0]
-    words = first_sentence.split()
-    for word in words:
-        if word.isdigit() and len(word) == 4:
-            return int(word)
-    return None
-
 # Define queries to be answered
 queries = [
-    "What was the key revenue driver for Wipro in the year 2022?",
-    "Summarize the chairman's message for TCS in 2023",
-    "What were the risks outlined by Infosys in 2021, and how does that compare with 2022?"
+    "What was the key revenue driver for Wipro?",
+    "Summarize the chairman's message for TCS",
+    "What were the risks outlined by Infosys, and how does that compare?"
 ]
 
 # Use the functions
 directory_path = '/workspaces/NewTuple-Assignment/Assignment_dataset/'
 
 # Loop through all PDF files in the directory
-for filename in os.listdir(directory_path):
-    if filename.endswith('.pdf'):
-        file_path = os.path.join(directory_path, filename)
-        try:
-            text = extract_text_from_pdf(file_path)
-            if text is None:
-                print(f"Failed to extract text from {file_path}")
-                continue
+for query in queries:
+    print(f"\nQuery: {query}")
+    for filename in os.listdir(directory_path):
+        if filename.endswith('.pdf'):
+            file_path = os.path.join(directory_path, filename)
+            try:
+                text = extract_text_from_pdf(file_path)
+                if text is None:
+                    print(f"Failed to extract text from {file_path}")
+                    continue
 
-            financials = extract_financials(text)
-            company_name = os.path.splitext(filename)[0]
-            # year = extract_year(text)
-            sentences = process_text(text)
+                financials = extract_financials(text)
+                company_name = os.path.splitext(filename)[0]
+                sentences = process_text(text)
 
-            # # Skip files without valid year
-            # if year is None:
-            #     print(f"Failed to extract year from {file_path}")
-            #     continue
+                print(f"\nCompany: {company_name}")
+                print(f"Financials: {financials}")
 
-            print(f"\nCompany: {company_name}, Year:")
-            print(f"Financials: {financials}")
-
-            for query in queries:
                 answer = answer_query(query, sentences)
-                print(f"\nQuery: {query}")
                 print(f"Answer: {answer}")
 
-        except Exception as e:
-            print(f"Error processing file {file_path}: {e}")
+            except Exception as e:
+                print(f"Error processing file {file_path}: {e}")
